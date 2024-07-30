@@ -1,0 +1,87 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}{{ product.name }} - Product Details{% endblock %}
+
+{% block hero %}
+
+{% endblock %}
+
+{% block content %}
+<!-- Product Detail Section -->
+<section class="container mx-auto py-8">
+    <div class="bg-white p-6 rounded shadow">
+        <div class="flex items-center">
+            <!-- Product Image -->
+            <div class="flex-shrink-0 w-1/2 pr-4">
+                {% if product.image %}
+                    <img src="{{ product.image.url }}" alt="{{ product.name }}" class="w-full h-64 object-cover rounded">
+                {% else %}
+                    <div class="w-full h-64 bg-gray-200 rounded"></div>
+                {% endif %}
+            </div>
+            <!-- Product Text -->
+            <div class="w-1/2">
+                <h1 class="text-3xl font-semibold mb-4">{{ product.name }}</h1>
+                <p class="text-gray-600 mb-4">{{ product.description }}</p>
+                <p class="text-lg font-semibold mb-4">KES{{ product.price }}</p>
+                <!-- Checkout Button -->
+                <a href="{% url 'checkout' product.id %}" class="bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600">Buy Now</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Customer Reviews Section -->
+<section class="container mx-auto py-8">
+    <div class="bg-white p-6 rounded shadow">
+        <h2 class="text-2xl font-semibold mb-4">Customer Reviews</h2>
+        {% if reviews %}
+            <div class="space-y-4">
+                {% for review in reviews %}
+                    <div class="border-b border-gray-300 pb-4 mb-4">
+                        <h3 class="font-semibold text-lg">{{ review.author }}</h3>
+                        <p class="text-gray-600 mb-2">{{ review.comment }}</p>
+                        <p class="text-yellow-500">Rating: {{ review.rating }} / 5</p>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p class="text-gray-600">No reviews yet.</p>
+        {% endif %}
+    </div>
+</section>
+
+<!-- Related Products Section -->
+<section class="container mx-auto py-8">
+    <h2 class="text-2xl font-semibold mb-4">Related Products</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {% for related_product in related_products %}
+            <div class="bg-white p-4 rounded shadow">
+                {% if related_product.image %}
+                    <img src="{{ related_product.image.url }}" alt="{{ related_product.name }}" class="w-full h-32 object-cover mb-4 rounded">
+                {% else %}
+                    <div class="w-full h-32 bg-gray-200 mb-4 rounded"></div>
+                {% endif %}
+                <h3 class="text-xl font-semibold mb-2">{{ related_product.name }}</h3>
+                <p class="text-gray-600 mb-2">KES{{ related_product.price }}</p>
+                <a href="{% url 'product_detail' related_product.id %}" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">View Details</a>
+            </div>
+        {% empty %}
+            <p class="text-gray-600">No related products available.</p>
+        {% endfor %}
+    </div>
+</section>
+
+<!-- Product Specifications Section -->
+<section class="container mx-auto py-8">
+    <div class="bg-white p-6 rounded shadow">
+        <h2 class="text-2xl font-semibold mb-4">Product Specifications</h2>
+        <ul class="list-disc pl-5 space-y-2 text-gray-600">
+            <li><strong>Weight:</strong> {{ product.weight }} kg</li>
+            <li><strong>Dimensions:</strong> {{ product.dimensions }}</li>
+            <li><strong>Material:</strong> {{ product.material }}</li>
+            <!-- Add more specifications as needed -->
+        </ul>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,46 @@
+{% extends "layouts/admin.html" %}
+
+{% block title %}Manage Users{% endblock %}
+
+{% block content %}
+    <h2 class="text-2xl font-semibold mb-4">Manage Users</h2>
+
+    <!-- Users Table -->
+    <div class="bg-white p-6 rounded shadow">
+        {% if users %}
+            <div class="overflow-x-auto">
+                <table class="w-full border-collapse">
+                    <thead>
+                        <tr class="border-b bg-gray-100 text-left">
+                          
+                            <th class="px-4 py-2">Username</th>
+                            <th class="px-4 py-2">Email</th>
+                            <th class="px-4 py-2">Date Joined</th>
+                            <th class="px-4 py-2">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in users %}
+                            <tr class="border-b hover:bg-gray-50">
+                               
+                                <td class="px-4 py-2">{{ user.first_name }} {{ user.last_name }}</td>
+                                <td class="px-4 py-2">{{ user.email }}</td>
+                                <td class="px-4 py-2">{{ user.created_at|date:"F j, Y, g:i a" }}</td>
+                                <td class="px-4 py-2">
+                                    <!-- Delete User Form -->
+                                    <form method="post" action="{% url 'manage_users' %}" class="inline">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="user_id" value="{{ user.id }}">
+                                        <button type="submit" name="delete_user" class="text-red-500 hover:underline">Delete</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <p class="text-gray-600">No users found.</p>
+        {% endif %}
+    </div>
+{% endblock %}

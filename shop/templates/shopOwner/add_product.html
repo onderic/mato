@@ -1,0 +1,68 @@
+{% extends "layouts/owner_base.html" %}
+
+{% block title %}Shop Orders{% endblock %}
+
+{% block content %}
+        <!-- Main Content -->
+        <main class="flex-grow container mx-auto p-4">
+            <h1 class="text-3xl font-semibold mb-4">Add a New Product</h1>
+            <form method="post" action="{% url 'shopowner_add_product' %}" enctype="multipart/form-data" class="bg-white p-6 rounded shadow-md">
+                {% csrf_token %}
+                <div class="mb-4">
+                    <label for="product_name" class="block text-gray-700 font-semibold">Product Name</label>
+                    <input type="text" id="product_name" name="product_name" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm" required>
+                </div>
+                <div class="mb-4">
+                    <label for="product_description" class="block text-gray-700 font-semibold">Product Description</label>
+                    <textarea id="product_description" name="product_description" rows="4" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm" required></textarea>
+                </div>
+                <div class="mb-4">
+                    <label for="product_price" class="block text-gray-700 font-semibold">Product Price</label>
+                    <input type="number" id="product_price" name="product_price" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm" step="0.01" required>
+                </div>
+                <div class="mb-4">
+                    <label for="product_image" class="block text-gray-700 font-semibold">Product Image</label>
+                    <input type="file" id="product_image" name="product_image" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm">
+                </div>
+                <button type="submit" class="w-full bg-green-500 text-white px-4 py-2 rounded-md shadow hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500">Add Product</button>
+            </form>
+
+            <!-- List of Products -->
+            <section class="mt-8">
+                <h2 class="text-2xl font-semibold mb-4">Your Products</h2>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full bg-white border border-gray-300 rounded shadow-md">
+                        <thead>
+                            <tr class="border-b bg-gray-200">
+                                <th class="px-4 py-2 text-left">Image</th>
+                                <th class="px-4 py-2 text-left">Name</th>
+                                <th class="px-4 py-2 text-left">Description</th>
+                                <th class="px-4 py-2 text-left">Price</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for product in products %}
+                                <tr class="border-b">
+                                    <td class="px-4 py-2">
+                                        {% if product.image %}
+                                            <img src="{{ product.image.url }}" alt="{{ product.name }}" class="w-20 h-20 object-cover">
+                                        {% else %}
+                                            <div class="w-20 h-20 bg-gray-200"></div>
+                                        {% endif %}
+                                    </td>
+                                    <td class="px-4 py-2">{{ product.name }}</td>
+                                    <td class="px-4 py-2">{{ product.description }}</td>
+                                    <td class="px-4 py-2 text-green-600 font-bold">{{ product.price|floatformat:2 }}</td>
+                                </tr>
+                            {% empty %}
+                                <tr>
+                                    <td colspan="4" class="px-4 py-2 text-center text-gray-500">No products found.</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+            
+        </main>
+{% endblock %}
