@@ -37,11 +37,6 @@ def register_view(request):
 
 
 
-from django.shortcuts import render, redirect
-from django.contrib.auth import authenticate, login
-from django.contrib import messages
-from .forms import LoginForm
-
 def login_view(request):
     if request.method == 'POST':
         form = LoginForm(request.POST)

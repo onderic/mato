@@ -3,7 +3,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from shop.forms import ProductForm, ShopRegistrationForm
-from shop.models import ContactMessage, Order, Product, Shop
+from shop.models import Category, ContactMessage, Order, Product, Shop
 from django.urls import reverse
 from django.db.models import Sum,F
 
@@ -12,7 +12,8 @@ from users.models import User
 
 def home(request):
     products = Product.objects.all()
-    return render(request, 'index.html', {'products': products})
+    categories = Category.objects.all()
+    return render(request, 'index.html', {'products': products,'categories':categories})
 
 
 @login_required
@@ -23,7 +24,6 @@ def admin_dashboard(request):
     # Fetch total number of users
     total_users = User.objects.count()
 
-    # Fetch total number of orders
     total_orders = Order.objects.count()
 
     total_sales = Order.objects.annotate(
@@ -42,19 +42,16 @@ def admin_dashboard(request):
 
 
 
+@login_required
 def shopowner_dashboard(request):
     user = request.user
 
-    # Ensure the user is a shop owner
     try:
         shop = user.shop
     except Shop.DoesNotExist:
-        return render(request, 'error.html', {'message': 'Shop not found'})
-
-    # Get all orders for the shop
+        return render(request, 'shopOwner/register_shop.html', {'message': 'Please create your shop to start managing orders and products.'})
+    
     orders = Order.objects.filter(product__shop=shop)
-
-    # Calculate total sales and orders
     total_sales = sum(order.quantity * order.product.price for order in orders)
     total_orders = orders.count()
     total_products = Product.objects.filter(shop=shop).count()
@@ -64,11 +61,12 @@ def shopowner_dashboard(request):
         'total_orders': total_orders,
         'total_products': total_products,
     }
-    
-    return render(request, 'shopOwner/shopowner_dashboard.html',context)
+
+    return render(request, 'shopOwner/shopowner_dashboard.html', context)
+
+
 
 def buyer_dashboard(request):
-    # Logic for buyer dashboard
     return render(request, 'buyer_dashboard.html')
 
 
@@ -80,13 +78,11 @@ def buyer_orders(request):
 
 @login_required
 def buyer_account_settings(request):
-    # Placeholder for account settings data. Replace with actual data fetching logic.
     user = request.user
     context = {
         'email': user.email,
         'first_name': user.first_name,
         'last_name': user.last_name,
-        # Add more user details as needed
     }
     return render(request, 'buyer/account_settings.html', context)
 
@@ -317,3 +313,13 @@ def manage_products(request):
         'form': form
     }
     return render(request, 'admin/manage_products.html', context)
+
+@login_required
+def manage_and_add_categories(request):
+    if request.method == 'POST':
+        category_name = request.POST.get('name')
+        if category_name:
+            Category.objects.create(name=category_name)
+            return redirect('manage_and_add_categories')    
+    categories = Category.objects.all()
+    return render(request, 'admin/add_category.html', {'categories': categories})

@@ -32,6 +32,7 @@ urlpatterns = [
 
     path('manage-users/', views.manage_users, name='manage_users'),
     path('admn/products/', views.manage_products, name='admin_products'),
+    path('manage-and-add-categories/', views.manage_and_add_categories, name='manage_and_add_categories'),
 
     
 ]
