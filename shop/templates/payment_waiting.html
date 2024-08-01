@@ -1,0 +1,42 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}Payment Page{% endblock %}
+
+{% block content %}
+<div class="flex flex-col items-center justify-center h-screen p-4 bg-gray-100">
+    <div class="text-center">
+        <h1 class="text-2xl font-bold mb-4">Payment Processing</h1>
+        <p class="text-lg mb-6">Your payment is being processed. Please wait...</p>
+        <!-- Loader -->
+        <div class="flex items-center justify-center mb-6">
+            <svg class="w-12 h-12 text-gray-500 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 12a8 8 0 018-8m0 16a8 8 0 01-8-8m8 8a8 8 0 008-8M4 12a8 8 0 008-8m0 16a8 8 0 01-8-8M4 12a8 8 0 018-8" />
+            </svg>
+        </div>
+        <script>
+            let attempts = 0;
+            const maxAttempts = 5;
+
+            function checkPaymentStatus() {
+                fetch('/payment/status/')
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.is_processed || data.error) {
+                            window.location.href = '/order-confirmation/{{ order.id }}/';
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+
+                attempts += 1;
+                if (attempts >= maxAttempts) {
+                    window.location.href = '/order-confirmation/{{ order.id }}/';
+                }
+            }
+            
+            setInterval(checkPaymentStatus, 2000);
+        </script>
+    </div>
+</div>
+{% endblock %}

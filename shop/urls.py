@@ -34,6 +34,12 @@ urlpatterns = [
     path('admn/products/', views.manage_products, name='admin_products'),
     path('manage-and-add-categories/', views.manage_and_add_categories, name='manage_and_add_categories'),
 
+
+    path('payment/<int:order_id>/', views.payment_page, name='payment_page'),
+    path('mpesa_callback/', views.mpesa_callback, name='mpesa_callback'),
+    path('payment/waiting/', views.payment_waiting_page, name='payment_waiting_page'),
+    path('payment/status/', views.check_payment_status, name='check_payment_status'),
+
     
 ]
 

@@ -1,13 +1,16 @@
-from django.http import HttpResponseRedirect
+import json
+from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from shop.forms import ProductForm, ShopRegistrationForm
-from shop.models import Category, ContactMessage, Order, Product, Shop
+from shop.models import Category, ContactMessage, Mpesa, Order, Product, Shop
 from django.urls import reverse
 from django.db.models import Sum,F
 
 from users.models import User
+from .daraja import LipaNaMpesa
+from django.views.decorators.csrf import csrf_exempt
 
 
 def home(request):
@@ -20,8 +23,7 @@ def home(request):
 def admin_dashboard(request):
     # Fetch the latest 5 orders
     latest_orders = Order.objects.all().order_by('-created_at')[:5]
-    
-    # Fetch total number of users
+
     total_users = User.objects.count()
 
     total_orders = Order.objects.count()
@@ -181,7 +183,6 @@ def product_list(request):
     products = Product.objects.all()
     return render(request, 'product_list.html', {'products': products})
 
-
 @login_required
 def checkout(request, product_id):
     product = get_object_or_404(Product, id=product_id)
@@ -202,18 +203,135 @@ def checkout(request, product_id):
         order = Order(
             user=request.user,
             product=product,
-            quantity=1,  # Assuming a single product per order
+            quantity=1, 
             shipping_address=shipping_address,
             shipping_city=shipping_city,
             shipping_postal_code=shipping_postal_code,
             shipping_country=shipping_country
         )
         order.save()
-
-        # Redirect to a confirmation or success page
-        return HttpResponseRedirect(reverse('order_confirmation', args=[order.id]))
+        return redirect(reverse('payment_page', args=[order.id]))
 
     return render(request, 'shop/checkout.html', {'product': product})
+
+
+@login_required
+def payment_page(request, order_id):
+    order = get_object_or_404(Order, id=order_id)
+    product = order.product
+
+    if request.method == 'POST':
+        phone_number = request.POST.get('phone_number')
+
+        if not phone_number:
+            return render(request, 'payment.html', {
+                'order': order,
+                'product': product,
+                'error_message': 'Please enter your phone number.'
+            })
+        
+        lipa_na_mpesa = LipaNaMpesa()
+        amount = product.price
+        payload = {
+            'amount': amount,
+            'phone_number': phone_number,
+            'order': order.id,
+        }
+        response = lipa_na_mpesa.stk_push(payload)
+        
+        if response.get('ResponseCode') == '0': 
+            checkout_request_id = response.get('CheckoutRequestID')
+
+            Mpesa.objects.create(
+                order=order,
+                is_processed=False
+            )
+            
+            request.session['order_id'] = order.id
+            request.session['checkout_request_id'] = checkout_request_id
+
+            return redirect('payment_waiting_page')
+        else:
+            return render(request, 'payment.html', {
+                'order': order,
+                'product': product,
+                'error_message': 'Payment initiation failed. Please try again.'
+            })
+
+    return render(request, 'payment.html', {'order': order, 'product': product})
+
+@csrf_exempt
+def mpesa_callback(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        checkout_request_id = data.get('CheckoutRequestID')
+        result_code = data.get('ResultCode')
+        result_description = data.get('ResultDesc')
+
+        try:
+            transaction = Mpesa.objects.get(checkout_request_id=checkout_request_id)
+            transaction.result_code = result_code
+            transaction.result_description = result_description
+            transaction.is_processed = result_code == 0
+            transaction.save()
+
+            if transaction.is_processed:
+                order = Order.objects.get(product=transaction.product, user=transaction.user)
+                order.status = 'Paid' 
+                order.save()
+
+            return JsonResponse({'status': 'success'})
+        except Mpesa.DoesNotExist:
+            return JsonResponse({'status': 'failed', 'message': 'Transaction not found'})
+    
+    return JsonResponse({'status': 'failed', 'message': 'Invalid request'})
+
+@login_required
+def payment_waiting_page(request):
+    order_id = request.session.get('order_id')
+    checkout_request_id = request.session.get('checkout_request_id')
+    
+    if not order_id or not checkout_request_id:
+        return redirect('home')
+
+    try:
+        transaction = Mpesa.objects.get(checkout_request_id=checkout_request_id)
+        
+        if transaction.is_processed:
+            context = {
+                'order': get_object_or_404(Order, id=order_id),
+                'transaction': transaction,
+                'message': 'Your payment has been processed successfully!'
+            }
+        else:
+            context = {
+                'order': get_object_or_404(Order, id=order_id),
+                'transaction': transaction,
+                'message': 'Your payment is still being processed. Please check back later.'
+            }
+    except Mpesa.DoesNotExist:
+        context = {
+            'message': 'Transaction details not found.'
+        }
+    
+    return render(request, 'payment_waiting.html', context)
+
+@login_required
+def check_payment_status(request):
+    checkout_request_id = request.session.get('checkout_request_id')
+    
+    if not checkout_request_id:
+        return JsonResponse({'error': 'No checkout request ID found'}, status=400)
+
+    try:
+        transaction = Mpesa.objects.get(checkout_request_id=checkout_request_id)
+        
+        if transaction.is_processed:
+            return JsonResponse({'is_processed': True})
+        else:
+            return JsonResponse({'is_processed': False})
+    except Mpesa.DoesNotExist:
+        return JsonResponse({'error': 'Transaction not found'}, status=404)
 
 @login_required
 def order_confirmation(request, order_id):

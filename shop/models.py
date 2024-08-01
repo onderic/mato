@@ -16,6 +16,9 @@ class Product(models.Model):
 
     def __str__(self):
         return self.name
+    
+
+
 
 class Order(models.Model):
     ORDER_STATUS_CHOICES = [
@@ -39,7 +42,24 @@ class Order(models.Model):
 
     def __str__(self):
         return f"Order {self.id} by {self.user.username}"
-    
+
+class Mpesa(models.Model):
+    order = models.ForeignKey(Order, on_delete=models.CASCADE)
+    merchant_request_id = models.CharField(max_length=100)
+    checkout_request_id = models.CharField(max_length=100)
+    result_code = models.IntegerField(null=True, blank=True)
+    result_description = models.TextField(null=True, blank=True)
+    amount = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    mpesa_receipt_number = models.CharField(max_length=50, null=True, blank=True)
+    transaction_date = models.CharField(max_length=255, null=True, blank=True)
+    phone_number = models.CharField(max_length=15, null=True, blank=True)
+    status = models.CharField(max_length=20, null=True, blank=True)
+    is_processed = models.BooleanField(default=False, blank=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"M-Pesa Transaction - {self.checkout_request_id}"
+        
 
 class ContactMessage(models.Model):
     name = models.CharField(max_length=255)
@@ -53,3 +73,7 @@ class ContactMessage(models.Model):
     
 class Category(models.Model):
     name = models.CharField(max_length=200)
+
+
+
+
