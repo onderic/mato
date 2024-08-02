@@ -92,7 +92,7 @@
                         <select name="user_type" id="id_user_type" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
                             <option value="">Select User Type</option>
                             <option value="BUYER" {% if form.user_type.value == 'BUYER' %}selected{% endif %}>Buyer</option>
-                            <option value="SHOPOWNER" {% if form.user_type.value == 'SHOPOWNER' %}selected{% endif %}>Shop Owner</option>
+                            <option value="LEFTOVERHUB" {% if form.user_type.value == 'LEFTOVERHUB' %}selected{% endif %}>Left Over Hub</option>
                         </select>
                         {% if form.user_type.errors %}
                             <p class="text-red-500 text-sm mt-1">{{ form.user_type.errors }}</p>

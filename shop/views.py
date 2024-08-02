@@ -127,9 +127,17 @@ def add_product(request):
         product_name = request.POST.get('product_name')
         product_description = request.POST.get('product_description')
         product_price = request.POST.get('product_price')
+        category_id = request.POST.get('category_id')
         product_image = request.FILES.get('product_image')
-        if not product_name or not product_description or not product_price:
+
+        if not product_name or not product_description or not product_price or not category_id:
             messages.error(request, 'Please fill in all fields.')
+            return render(request, 'shop/add_product.html')
+
+        try:
+            category = Category.objects.get(id=category_id)
+        except Category.DoesNotExist:
+            messages.error(request, 'Selected category does not exist.')
             return render(request, 'shop/add_product.html')
 
         # Create and save Product instance
@@ -138,6 +146,7 @@ def add_product(request):
             name=product_name,
             description=product_description,
             price=product_price,
+            category=category,
             image=product_image
         )
         product.save()
@@ -147,8 +156,24 @@ def add_product(request):
 
     # Handle GET request and fetch products
     products = Product.objects.filter(shop=request.user.shop)
+    categories = Category.objects.all()
     form = ProductForm()
-    return render(request, 'shopOwner/add_product.html', {'form': form, 'products': products})
+    return render(request, 'shopOwner/add_product.html', {'form': form, 'products': products, 'categories': categories})
+
+
+@login_required
+def update_order_status(request, order_id):
+    if request.method == 'POST':
+        order = get_object_or_404(Order, id=order_id)
+        new_status = request.POST.get('status')
+        if new_status in dict(Order.ORDER_STATUS_CHOICES).keys():
+            order.status = new_status
+            order.save()
+        return redirect('shopowner_orders')
+
+    return redirect('shopowner_orders')
+
+
 
 def product_detail(request, product_id):
     product = get_object_or_404(Product, id=product_id)
@@ -188,12 +213,11 @@ def checkout(request, product_id):
     product = get_object_or_404(Product, id=product_id)
 
     if request.method == 'POST':
-        shipping_address = request.POST.get('shipping_address')
-        shipping_city = request.POST.get('shipping_city')
-        shipping_postal_code = request.POST.get('shipping_postal_code')
-        shipping_country = request.POST.get('shipping_country')
+        address = request.POST.get('address')
+        phone_number = request.POST.get('phone_number')
+        location = request.POST.get('location')
 
-        if not (shipping_address and shipping_city and shipping_postal_code and shipping_country):
+        if not (address and phone_number and location ):
             return render(request, 'shop/checkout.html', {
                 'product': product,
                 'error_message': 'Please fill in all fields.'
@@ -204,10 +228,9 @@ def checkout(request, product_id):
             user=request.user,
             product=product,
             quantity=1, 
-            shipping_address=shipping_address,
-            shipping_city=shipping_city,
-            shipping_postal_code=shipping_postal_code,
-            shipping_country=shipping_country
+            address=address,
+            phone_number=phone_number,
+            location=location,
         )
         order.save()
         return redirect(reverse('payment_page', args=[order.id]))
@@ -364,6 +387,11 @@ def contact_view(request):
         return redirect('contact')
 
     return render(request, 'contact.html')
+
+@login_required
+def contact_message(request):
+    contacts = ContactMessage.objects.all()
+    return render(request, "admin/messages.html", {"contacts": contacts})
 
 
 @login_required

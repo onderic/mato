@@ -1,0 +1,40 @@
+{% extends "layouts/admin.html" %}
+
+{% block title %}Contact Messages{% endblock %}
+
+{% block content %}
+    <h1 class="text-3xl font-semibold mb-4">Contact messages for Admin</h1>
+    <div class="bg-white p-6 rounded shadow mt-8">
+        <h2 class="text-xl font-bold mb-2">Messages List</h2>
+        {% if contacts %}
+            <div class="overflow-x-auto">
+                <table class="w-full border-collapse">
+                    <thead>
+                        <tr class="border-b bg-gray-100 text-left">
+                            <th class="px-4 py-2">ID</th>
+                            <th class="px-4 py-2">Name</th>
+                            <th class="px-4 py-2">Email</th>
+                            <th class="px-4 py-2">Subject</th>
+                            <th class="px-4 py-2">Message</th>
+                            <!-- <th class="px-4 py-2">Actions</th> -->
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for contact in contacts %}
+                            <tr class="border-b hover:bg-gray-50">
+                                <td class="px-4 py-2">{{ contact.id }}</td>
+                                <td class="px-4 py-2">{{ contact.name }}</td>
+                                <td class="px-4 py-2">{{ contact.email }}</td>
+                                <td class="px-4 py-2">{{ contact.subject }}</td>
+                                <td class="px-4 py-2">{{ contact.message }}</td>
+                             
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <p class="text-gray-600">No Messages available.</p>
+        {% endif %}
+    </div>
+{% endblock %}

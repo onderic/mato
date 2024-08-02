@@ -11,7 +11,7 @@
         <!-- Sidebar -->
         <aside class="bg-green-800 text-white w-full lg:w-64 p-4 space-y-4">
             <div>
-                <a href="/" class="text-2xl font-bold">Shop Owner Dashboard</a>
+                <a href="/" class="text-2xl font-bold">LeftOverHub</a>
             </div>
             <nav>
                 <ul class="space-y-2">
@@ -19,15 +19,16 @@
                         <a href="{% url 'shopowner_dashboard' %}" class="block p-2 rounded hover:bg-green-700">Dashboard</a>
                     </li>
                     <li>
-                        <a href="{% url 'shopowner_register_shop' %}" class="block p-2 rounded hover:bg-green-700">Register Shop</a>
+                        <a href="{% url 'shopowner_orders' %}" class="block p-2 rounded hover:bg-green-700">Orders</a>
+                    </li>
+                   
+                    <li>
+                        <a href="{% url 'shopowner_register_shop' %}" class="block p-2 rounded hover:bg-green-700">Register LeftOverHub</a>
                     </li>
                     <li>
                         <a href="{% url 'shopowner_add_product' %}" class="block p-2 rounded hover:bg-green-700">Add Product</a>
                     </li>
-                    <li>
-                        <a href="{% url 'shopowner_orders' %}" class="block p-2 rounded hover:bg-green-700">Orders</a>
-                    </li>
-                   
+                 
                 </ul>
             </nav>
             <div class="mt-4">

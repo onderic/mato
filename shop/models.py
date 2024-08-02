@@ -7,10 +7,16 @@ class Shop(models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField()
 
+
+class Category(models.Model):
+    name = models.CharField(max_length=200)
+
+
 class Product(models.Model):
     shop = models.ForeignKey('Shop', on_delete=models.CASCADE)
     name = models.CharField(max_length=255)
     description = models.TextField()
+    category = models.ForeignKey('category', on_delete=models.CASCADE)
     price = models.DecimalField(max_digits=10, decimal_places=2)
     image = models.ImageField(upload_to='products/', blank=True, null=True) 
 
@@ -32,10 +38,9 @@ class Order(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField(default=1)
-    shipping_address = models.TextField()
-    shipping_city = models.CharField(max_length=255)
-    shipping_postal_code = models.CharField(max_length=20)
-    shipping_country = models.CharField(max_length=255)
+    address = models.TextField()
+    phone_number = models.CharField(max_length=255)
+    location = models.CharField(max_length=20)
     status = models.CharField(max_length=20, choices=ORDER_STATUS_CHOICES, default='Pending')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -71,8 +76,6 @@ class ContactMessage(models.Model):
     def __str__(self):
         return f"{self.name} - {self.subject}"
     
-class Category(models.Model):
-    name = models.CharField(max_length=200)
 
 
 

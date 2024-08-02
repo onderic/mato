@@ -51,7 +51,7 @@ def login_view(request):
                 # Redirect based on user type
                 if user.user_type == 'ADMIN':
                     return redirect('admin_dashboard')
-                elif user.user_type == 'SHOPOWNER':
+                elif user.user_type == 'LEFTOVERHUB':
                     return redirect('shopowner_dashboard')
                 elif user.user_type == 'BUYER':
                     return redirect('user_dashboard')

@@ -19,10 +19,10 @@
                 <p><strong>Order ID:</strong> {{ order.id }}</p>
                 <p><strong>Product:</strong> {{ order.product.name }}</p>
                 <p><strong>Quantity:</strong> {{ order.quantity }}</p>
-                <p><strong>Shipping Address:</strong> {{ order.shipping_address }}</p>
-                <p><strong>City:</strong> {{ order.shipping_city }}</p>
-                <p><strong>Postal Code:</strong> {{ order.shipping_postal_code }}</p>
-                <p><strong>Country:</strong> {{ order.shipping_country }}</p>
+                <p><strong>Delivery Address:</strong> {{ order.address }}</p>
+                <p><strong>Phone Number:</strong> {{ order.phone_number }}</p>
+                <p><strong>Location:</strong> {{ order.location }}</p>
+               
             </div>
             <a href="{% url 'home' %}" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Back to Home</a>
         </div>

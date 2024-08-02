@@ -4,7 +4,7 @@ from django.db import models
 
 class UserType(models.TextChoices):
     ADMIN = 'ADMIN', 'Admin'
-    SHOPOWNER = 'SHOPOWNER', 'Shop Owner'
+    LEFTOVERHUB = 'LEFTOVERHUB', 'Left Over Hub'
     BUYER = 'BUYER', 'Buyer'
 
 class CustomUserManager(UserManager):

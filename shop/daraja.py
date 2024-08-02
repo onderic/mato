@@ -6,7 +6,7 @@ import requests
 from datetime import datetime
 from requests.auth import HTTPBasicAuth
 from dotenv import load_dotenv
-from .models import Order, Product, Mpesa
+from .models import Order, Mpesa
 
 load_dotenv()
 

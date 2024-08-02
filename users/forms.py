@@ -5,7 +5,7 @@ class SignUpForm(forms.ModelForm):
     password = forms.CharField(widget=forms.PasswordInput, label='Password')
     confirm_password = forms.CharField(widget=forms.PasswordInput, label='Confirm Password')
     user_type = forms.ChoiceField(choices=[
-        ('SHOPOWNER', 'Shop Owner'),
+        ('LEFTOVERHUB', 'Left Over Hub'),
         ('BUYER', 'Buyer')
     ], label='User Type')
 

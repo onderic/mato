@@ -21,6 +21,15 @@
                     <input type="number" id="product_price" name="product_price" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm" step="0.01" required>
                 </div>
                 <div class="mb-4">
+                    <label for="category_id" class="block text-gray-700 font-semibold">Category</label>
+                    <select id="category_id" name="category_id" class="form-select mt-1 block w-full px-4 py-2 rounded-md shadow-sm">
+                        {% for category in categories %}
+                            <option value="{{ category.id }}">{{ category.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="mb-4">
                     <label for="product_image" class="block text-gray-700 font-semibold">Product Image</label>
                     <input type="file" id="product_image" name="product_image" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm">
                 </div>
@@ -36,6 +45,7 @@
                             <tr class="border-b bg-gray-200">
                                 <th class="px-4 py-2 text-left">Image</th>
                                 <th class="px-4 py-2 text-left">Name</th>
+                                <th class="px-4 py-2 text-left">Category</th>
                                 <th class="px-4 py-2 text-left">Description</th>
                                 <th class="px-4 py-2 text-left">Price</th>
                             </tr>
@@ -51,6 +61,7 @@
                                         {% endif %}
                                     </td>
                                     <td class="px-4 py-2">{{ product.name }}</td>
+                                    <td class="px-4 py-2">{{ product.category.name }}</td>
                                     <td class="px-4 py-2">{{ product.description }}</td>
                                     <td class="px-4 py-2 text-green-600 font-bold">{{ product.price|floatformat:2 }}</td>
                                 </tr>
